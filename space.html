@@ -7,60 +7,62 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <title>Text Converter</title>
 </head>
 <body class="bg-light py-5">
 
     <div class="container">
         <h1 class="text-center mb-4">Text Conversion Tool</h1>
         
-        <!-- Full-width to Normal Text Conversion -->
+        <!-- Input Full-Width Text -->
         <div class="mb-4">
-            <label for="fullWidthText" class="form-label">Full-Width Text</label>
-            <textarea id="fullWidthText" class="form-control" rows="4"></textarea>
-        </div>
-        <button id="convertBtn" class="btn btn-primary w-100 mb-4">Convert to Normal Text</button>
-        <div class="mb-4">
-            <label for="normalText" class="form-label">Normal Text</label>
-            <textarea id="normalText" class="form-control" rows="4"></textarea>
+            <label for="fullWidthInput" class="form-label">Input Full-Width Text</label>
+            <textarea id="fullWidthInput" class="form-control" rows="6"></textarea>
         </div>
 
-        <!-- Add Spaces Between Words -->
-       
-        <button id="addSpacesBtn" class="btn btn-success w-100 mb-4">Add Spaces Between Words</button>
-        <div>
-            <label for="outputTextWithSpaces" class="form-label">Text with Added Spaces</label>
-            <textarea id="outputTextWithSpaces" class="form-control" rows="4" readonly></textarea>
+        <!-- Convert Button -->
+        <button id="convertTextBtn" class="btn btn-primary w-100 mb-4">Convert and Add Spaces</button>
+
+        <!-- Output Normalized Text -->
+        <div class="mb-4">
+            <label for="convertedText" class="form-label">Converted and Spaced Text</label>
+            <textarea id="convertedText" class="form-control" rows="6" readonly></textarea>
         </div>
     </div>
 
-    <!-- jQuery Script -->
+    <!-- JavaScript -->
     <script>
-        // Conversion Function: Full-width to Half-width
         function convertToNormal(text) {
-            return text.replace(/[\uFF01-\uFF5E]/g, (ch) => 
-                String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)
-            ).replace(/\u3000/g, ' '); // Replace full-width space with normal space
-        }
+    // Step 1: Convert full-width characters to normal-width characters
+    text = text.replace(/[\uFF01-\uFF5E]/g, ch => 
+        String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)
+    ).replace(/\u3000/g, ' '); // Replace full-width space with normal space
 
-        // Add spaces before uppercase letters
-        function addSpacesToSentence(text) {
-            return text.replace(/(?<!^)([A-Z])/g, ' $1'); // Add space before uppercase
-        }
+    // Step 2: Add spaces between words based on case transitions and patterns
+    text = text.replace(/([a-z])([A-Z])/g, '$1 $2') // Lowercase followed by Uppercase
+               .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2') // Uppercase followed by word
+               .replace(/([a-zA-Z])(\d)/g, '$1 $2') // Letters followed by numbers
+               .replace(/(\d)([a-zA-Z])/g, '$1 $2'); // Numbers followed by letters
 
-        // jQuery Event Listeners
+    // Step 3: Add spaces around punctuation
+    text = text.replace(/([.,()])/g, ' $1 ');
+
+    // Step 4: Fix common concatenated phrases
+    text = text.replace(/\bon(the|of|in|and)\b/g, ' on $1 ')
+               .replace(/\b(on|of|in|and)the\b/g, '$1 the ')
+               .replace(/\b(Laboratoryof|Ministryof|Disasterof)\b/g, (match) => 
+                   match.replace('of', ' of ')
+               );
+
+    // Step 5: Clean up extra spaces
+    return text.trim().replace(/\s{2,}/g, ' ');
+}
+
         $(document).ready(function () {
-            // Full-width to Normal Text
-            $('#convertBtn').on('click', function () {
-                const fullWidthText = $('#fullWidthText').val();
-                const normalText = convertToNormal(fullWidthText);
-                $('#normalText').val(normalText);
-            });
-
-            // Add Spaces Between Words
-            $('#addSpacesBtn').on('click', function () {
-                const normalText = $('#normalText').val();
-                const spacedText = addSpacesToSentence(normalText);
-                $('#outputTextWithSpaces').val(spacedText);
+            $('#convertTextBtn').on('click', function () {
+                const fullWidthInput = $('#fullWidthInput').val();
+                const convertedText = convertToNormal(fullWidthInput);
+                $('#convertedText').val(convertedText);
             });
         });
     </script>
