@@ -9,19 +9,27 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body class="bg-light py-5">
-<a href="space.html">click for space</a>
+
     <div class="container">
-        <h1 class="text-center mb-4">Normal Text</h1>
+        <h1 class="text-center mb-4">Text Conversion Tool</h1>
+        
+        <!-- Full-width to Normal Text Conversion -->
         <div class="mb-4">
             <label for="fullWidthText" class="form-label">Full-Width Text</label>
             <textarea id="fullWidthText" class="form-control" rows="4"></textarea>
         </div>
-
         <button id="convertBtn" class="btn btn-primary w-100 mb-4">Convert to Normal Text</button>
-
-        <div>
+        <div class="mb-4">
             <label for="normalText" class="form-label">Normal Text</label>
-            <textarea id="normalText" class="form-control" rows="4" readonly></textarea>
+            <textarea id="normalText" class="form-control" rows="4"></textarea>
+        </div>
+
+        <!-- Add Spaces Between Words -->
+       
+        <button id="addSpacesBtn" class="btn btn-success w-100 mb-4">Add Spaces Between Words</button>
+        <div>
+            <label for="outputTextWithSpaces" class="form-label">Text with Added Spaces</label>
+            <textarea id="outputTextWithSpaces" class="form-control" rows="4" readonly></textarea>
         </div>
     </div>
 
@@ -34,12 +42,25 @@
             ).replace(/\u3000/g, ' '); // Replace full-width space with normal space
         }
 
-        // jQuery Event Listener
+        // Add spaces before uppercase letters
+        function addSpacesToSentence(text) {
+            return text.replace(/(?<!^)([A-Z])/g, ' $1'); // Add space before uppercase
+        }
+
+        // jQuery Event Listeners
         $(document).ready(function () {
+            // Full-width to Normal Text
             $('#convertBtn').on('click', function () {
                 const fullWidthText = $('#fullWidthText').val();
                 const normalText = convertToNormal(fullWidthText);
                 $('#normalText').val(normalText);
+            });
+
+            // Add Spaces Between Words
+            $('#addSpacesBtn').on('click', function () {
+                const normalText = $('#normalText').val();
+                const spacedText = addSpacesToSentence(normalText);
+                $('#outputTextWithSpaces').val(spacedText);
             });
         });
     </script>
